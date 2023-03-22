@@ -31,7 +31,7 @@ def count(time, win:int, loss:int, prim_tent:int, prim_gale:int, seg_gale:int,bo
 
 # desktop notification settings
 def desktop_notification(message):
-    notification = Notify()
+    notification = notify()
     notification.title = 'Blaze'
     notification.message = message
     notification.icon = r'C:\Users\User\Downloads\python projects\blaze_bot\blaze-icon.png'
@@ -43,24 +43,6 @@ def bot_msg(title, message):
     pb.push_note(title, message)
 
 # basic api request
-def roulette_preview():
-    global last_doubles
-    last_doubles = last_doubles[1:]
-    colored_string = ', '.join([
-        f"\033[10;40m {item[0]} \033[m" if item[1] == "preto"
-        else f"\033[10;41m {item[0]} \033[m" if item[1] == "vermelho"
-        else f"\033[10;47m {item[0]} \033[m" for item in last_doubles])
-    print(f"\r{colored_string}", end="")
-
-
-def get_color(number):
-    colors = {
-        0: "branco",
-        1: "vermelho",
-        2: "preto"
-    }
-    return colors.get(number, None)
-
 def request():
     try:
         while True:  
@@ -68,8 +50,7 @@ def request():
             if req.status_code == 200:
                 break
         output = json.loads(req.text)
-        list_past_results = [{"color": "branco" if i["color"] == 0 else "vermelho" if i["color"] == 1 else "preto",
-                     "value": i["roll"]} for i in output]
+        list_past_results = [{'cor': row['color'], 'numero': row['roll']} for row in output]
         return list_past_results
     except: pass
 
@@ -79,21 +60,37 @@ def main_request(bot_telegram):
     while True:
         
         list_past_results = request()
-        # if list_past_results[0]['color'] =='1' and list_past_results[1]['color']=='2' and list_past_results[1]['numero']==14
+        # if list_past_results[0]['cor'] =='1' and list_past_results[1]['cor']=='2' and list_past_results[1]['numero']==14
         #   # estrategia2(list_past_results,bot_telegram)
         # elif            
-        if list_past_results[0]['color'] == "vermelho" and list_past_results[1]['color'] == "preto":
-            return print('⚫️/🔴 ESTRATEGIA 2📌'),apostar(list_past_results, bot_telegram)
+        if list_past_results[0]['cor'] == list_past_results[1]['cor'] and list_past_results[1]['cor'] == list_past_results[2]['cor']:
+            # 
+            return apostar(list_past_results, bot_telegram)
 
         print('Request feito:', datetime.now())
         sleep(1)
 
 # 
+# def estategia2(lista, bot_telegram):
+    # while True:
+    #         try:
+    #             bot_telegram.send_message('-749878368', '\U0001f916 Robô da Safablaze \U0001f916 \n\nApostar no vermelho e no branco. \U0001f534 \u26aa')
+    #             break
+    #         except Exception as e:
+    #             print('Erro:', e)
+    # martin gale(lista,bot_telegram)
 
 def apostar(lista, bot_telegram):
+    # if lista[0]['cor'] == lista[1]['cor'] and lista[2]['cor'] == lista[3]['cor'] and lista[4]['cor'] =='1' and lista[5]['numero'] =='2' and lista[5]['numero'] == 14:
+    #     while True:
+    #         try:
+    #             bot_telegram.send_message('-749878368', '\U0001f916 Robô da Safablaze \U0001f916 \n\nApostar no preto e no branco. \U0001f534 \u26aa')
+    #             break
+    #         except Exception as e:
+    #             print('Erro:', e)
 
     #elif
-    if lista[0]['color']:
+    if lista[0]['cor'] == 2:
         # desktop_notification('Apostar no vermelho e no branco')
         # bot_msg('Blaze', 'Apostar no vermelho e no branco.')
         while True:
@@ -103,7 +100,15 @@ def apostar(lista, bot_telegram):
             except Exception as e:
                 print('Erro:', e)
     #elif
-
+    if lista[0]['cor'] == 1:
+        # desktop_notification('Apostar no preto e no branco')       
+        # bot_msg('Blaze', 'Apostar no preto e no branco.')
+        while True:
+            try:
+                bot_telegram.send_message('-749878368', '\U0001f916 Robô da Safablaze \U0001f916 \n\nApostar no preto e no branco. \u26ab \u26aa')
+                break
+            except Exception as e:
+                print('Erro:', e)
 
     win = 0
     loss = 0
@@ -119,14 +124,13 @@ def apostar(lista, bot_telegram):
             list = new_list
             break
 
-    if list[0]['color'] == list[1]['color']:
+    if list[0]['cor'] != list[1]['cor']:
         prim_tent += 1
         # desktop_notification('WIIINNNN')
         # bot_msg('Blaze','WIIINNN')
         while True:
             try:
-                #bot_telegram.send_message('-749878368', 'WIIINNN')
-                bot_telegram.send_photo('-749878368', photo=open('Green.png', 'rb'))
+                bot_telegram.send_message('-749878368', '\u2705 \u2705 \u2705 \u2705 \nWIIINNN')
                 break
             except Exception as e:
                 print('Erro:', e)
@@ -138,7 +142,6 @@ def apostar(lista, bot_telegram):
         while True:
             try:
                 bot_telegram.send_message('-749878368', '\u26a0\ufe0f \u26a0\ufe0f \u26a0\ufe0f \u26a0\ufe0f  \nVamos para a primeira gale. \nDobre a aposta e repita a cor')
-                
                 break
             except Exception as e:
                 print('Erro:', e)
@@ -151,14 +154,13 @@ def apostar(lista, bot_telegram):
                 list = new_list
                 break
 
-        if list[0]['color'] == list[1]['color']:
+        if list[0]['cor'] != list[1]['cor']:
             prim_gale += 1
             # desktop_notification('WIIINNNN')
             # bot_msg('Blaze', 'WIIINNN')
             while True:
                 try:
-                    #bot_telegram.send_message('-749878368', '\u2705 \u2705 \u2705 \u2705 \nWIIINNN')
-                    bot_telegram.send_photo('-749878368', photo=open('Green.png', 'rb'))
+                    bot_telegram.send_message('-749878368', '\u2705 \u2705 \u2705 \u2705 \nWIIINNN')
                     break
                 except Exception as e:
                     print('Erro:', e)
@@ -183,13 +185,12 @@ def apostar(lista, bot_telegram):
                     list = new_list
                     break
 
-            if list[0]['color'] == list[1]['color']:
+            if list[0]['cor'] != list[1]['cor']:
                 # desktop_notification('WIIINNNN')
                 # bot_msg('Blaze', 'WIIINNN')
                 while True:
                     try:
-                        #bot_telegram.send_message('-749878368', '\u2705 \u2705 \u2705 \u2705 \nWIIINNN')
-                        bot_telegram.send_photo('-749878368', photo=open('Green.png', 'rb'))
+                        bot_telegram.send_message('-749878368', '\u2705 \u2705 \u2705 \u2705 \nWIIINNN')
                         break
                     except Exception as e:
                         print('Erro:', e)
@@ -201,8 +202,7 @@ def apostar(lista, bot_telegram):
                 # bot_msg('Blaze', 'Loss')
                 while True:
                     try:
-                        #bot_telegram.send_message('-749878368', '\u274c \u274c \u274c \u274c \nLoss')
-                        bot_telegram.send_photo('-749878368', photo=open('Loss.png', 'rb'))
+                        bot_telegram.send_message('-749878368', '\u274c \u274c \u274c \u274c \nLoss')
                         break
                     except Exception as e:
                         print('Erro:', e)
